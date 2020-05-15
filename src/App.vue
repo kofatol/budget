@@ -1,24 +1,62 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Form />
+    <TotalBalance />
+    <BudgetList @formSelected="onFormSelected" />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import BudgetList from "@/components/BudgetList";
+import TotalBalance from "@/components/TotalBalance";
+import Form from "@/components/Form";
+import { mapGetters } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
+    BudgetList,
+    TotalBalance,
+    Form
+  },
+  computed: {
+    ...mapGetters("budget", ["budgetList"])
+  },
+  watch: {
+    budgetList: "countBalance"
+  },
+  methods: {
+    ...mapActions("budget", ["countBalance"]),
+    onFormSelected(type) {
+      const listItems = document.querySelectorAll(".list-item");
+      const listItemsValues = document.querySelectorAll(
+        ".list-item .budget-value"
+      );
+      this.formSelectedHandler(type, listItems, listItemsValues);
+    },
+    formSelectedHandler(type, listItems, listItemsValues) {
+      for (let i = 0; i < listItemsValues.length; i++) {
+        if (type === "INCOME") {
+          listItemsValues[i].classList.contains("outcome-value")
+            ? (listItems[i].style.display = "none")
+            : (listItems[i].style.display = "");
+        } else if (type === "OUTCOME") {
+          listItemsValues[i].classList.contains("income-value")
+            ? (listItems[i].style.display = "none")
+            : (listItems[i].style.display = "");
+        } else {
+          listItems[i].style.display = "";
+        }
+      }
+    }
   }
-}
+};
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
